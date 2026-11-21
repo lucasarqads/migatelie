@@ -1,0 +1,226 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   Design tokens (Tailwind v4)
+   ========================================================================== */
+@theme {
+  /* Fontes */
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-display: "Unbounded", "Inter", ui-sans-serif, sans-serif;
+
+  /* Cores da marca */
+  --color-brand: #6b4423;
+  --color-brand-2: #a15c2d;
+  --color-ink: #2f2724;
+  --color-ink-soft: #5c4d44;
+  --color-cream: #fff6ec;
+  --color-cream-soft: rgb(255 240 225 / 0.78);
+  --color-peach: #ffd0a1;
+  --color-surface: #e8dbc8;
+  --color-bg: #f7f2eb;
+  --color-wine: #7d1d1a;
+
+  /* Breakpoints extras */
+  --breakpoint-tab: 45rem;   /* 720px  */
+  --breakpoint-xxl: 90rem;   /* 1440px */
+
+  /* Curvas de animação */
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Animações utilitárias */
+  --animate-shine: shine 3.2s ease-in-out infinite;
+  --animate-ping-soft: ping-soft 2.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+
+  @keyframes shine {
+    0%, 60% { left: -60%; }
+    100% { left: 130%; }
+  }
+  @keyframes ping-soft {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.9); opacity: 0; }
+  }
+  @keyframes shimmer {
+    to { background-position: -200% 0; }
+  }
+}
+
+/* Notebook com pouca altura (ex.: ThinkPad T450 1366×768) */
+@custom-variant short (@media (min-width: 64rem) and (max-height: 820px));
+@custom-variant fine (@media (hover: hover) and (pointer: fine));
+
+/* ==========================================================================
+   Vidro (glassmorphism)
+   ========================================================================== */
+/*
+ * Cards: vidro transparente (sem película escura).
+ * - fundo quase invisível + desfoque forte do que está atrás
+ * - reflexo suave na diagonal superior esquerda
+ * - borda fina e discreta, com a quina superior esquerda mais iluminada
+ * - granulado sutil (como vidro fosco)
+ */
+@utility glass {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"),
+    linear-gradient(145deg, rgb(255 255 255 / 0.14) 0%, rgb(255 255 255 / 0.04) 35%, rgb(255 255 255 / 0) 60%, rgb(255 255 255 / 0.04) 100%),
+    rgb(255 255 255 / 0.04);
+  border: 1px solid rgb(255 255 255 / 0.16);
+  backdrop-filter: blur(28px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(140%);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.3),
+    inset -1px -1px 0 rgb(255 255 255 / 0.06),
+    0 24px 48px -24px rgb(40 14 2 / 0.35);
+}
+
+/* Etiquetas e elementos pequenos: mesmo vidro transparente, mais leve */
+@utility glass-sm {
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 0.16) 0%, rgb(255 255 255 / 0.03) 60%),
+    rgb(255 255 255 / 0.04);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.28),
+    0 6px 14px -6px rgb(40 14 2 / 0.3);
+}
+
+@utility glass-brand {
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.35) 0%, rgb(255 255 255 / 0.05) 45%, rgb(255 255 255 / 0.12) 100%),
+    rgb(58 24 8 / 0.55);
+  border: 1px solid rgb(255 255 255 / 0.35);
+  backdrop-filter: blur(20px) saturate(170%);
+  -webkit-backdrop-filter: blur(20px) saturate(170%);
+  box-shadow:
+    inset 0 1.5px 0 rgb(255 255 255 / 0.55),
+    inset 0 0 22px rgb(255 255 255 / 0.12),
+    inset 0 -12px 24px -16px rgb(0 0 0 / 0.45),
+    0 18px 40px -12px rgb(80 45 20 / 0.4);
+}
+
+/* Hover dos cards: a borda acende e o card ganha profundidade */
+@utility glass-glow {
+  border-color: rgb(255 255 255 / 0.28);
+  box-shadow:
+    inset 1px 1px 0 rgb(255 255 255 / 0.42),
+    inset -1px -1px 0 rgb(255 255 255 / 0.08),
+    0 32px 60px -24px rgb(40 14 2 / 0.45);
+}
+
+/* Navegadores sem backdrop-filter: vidro mais opaco para manter a leitura */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass, .glass-sm { background: rgb(150 70 30 / 0.85); }
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+
+  body {
+    @apply font-sans text-ink antialiased overflow-x-hidden min-h-screen;
+    background-color: #7a3a17;
+  }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--color-peach);
+    outline-offset: 3px;
+  }
+
+  /* Proteção básica: sem seleção de texto, sem arrastar imagens, sem menu "salvar imagem" no toque longo */
+  body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+  img {
+    -webkit-user-drag: none;
+    user-drag: none;
+  }
+
+  /* Impressão (Ctrl+P): conteúdo oculto, só um aviso */
+  @media print {
+    #root { display: none !important; }
+    body { background: #fff !important; }
+    body::before {
+      content: "Conteúdo indisponível para impressão · Migateliê";
+      display: block;
+      padding: 48px 24px;
+      font: 600 16px/1.4 var(--font-sans);
+      color: #2f2724;
+      text-align: center;
+    }
+  }
+
+  /* Elementos com entrada animada começam ocultos (GSAP revela) */
+  [data-reveal] { opacity: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+    [data-reveal] { opacity: 1 !important; visibility: visible !important; }
+  }
+}
+
+/* ==========================================================================
+   Peças com gradientes longos (mais legíveis aqui do que em classes)
+   ========================================================================== */
+@layer components {
+  /* Granulado sobre o fundo */
+  .noise {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+  }
+
+  /* Véu sobre a foto da abertura */
+  .preloader-shade {
+    background:
+      radial-gradient(ellipse 90% 40% at 50% 50%, rgb(60 36 18 / 0.6) 0%, rgb(60 36 18 / 0.2) 70%, transparent 100%),
+      rgb(107 68 35 / 0.35);
+  }
+  @media (min-width: 45rem) {
+    .preloader-shade {
+      background:
+        radial-gradient(ellipse 45% 30% at 50% 50%, rgb(60 36 18 / 0.35) 0%, rgb(60 36 18 / 0.08) 70%, transparent 100%),
+        linear-gradient(90deg, rgb(107 68 35 / 0.75) 0%, rgb(107 68 35 / 0.25) 35%, rgb(107 68 35 / 0.25) 65%, rgb(107 68 35 / 0.6) 100%);
+    }
+  }
+
+  /* Brilho que passa pelo botão Agendar */
+  .shine::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.35), transparent);
+    transform: skewX(-20deg);
+    animation: var(--animate-shine);
+  }
+
+  /* Bolhas do aromatizador */
+  .bubble {
+    position: absolute;
+    border-radius: 9999px;
+    background: radial-gradient(circle at 30% 30%, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.15));
+    border: 1px solid rgb(255 255 255 / 0.6);
+  }
+}
+
+/* Swiper — paginação no estilo da marca */
+.services-swiper .swiper-pagination { bottom: 6px !important; }
+.services-swiper .swiper-pagination-bullet {
+  width: 6px; height: 6px;
+  background: var(--color-cream);
+  opacity: 0.3;
+  transition: width 0.4s var(--ease-out-expo), opacity 0.3s;
+}
+.services-swiper .swiper-pagination-bullet-active { width: 22px; border-radius: 4px; opacity: 1; }
+.swiper-nav .swiper-button-disabled { opacity: 0.35; pointer-events: none; }
